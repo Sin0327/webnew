@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料查询调试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .debug-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .debug-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .debug-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .debug-button:hover {
+            background: #0056b3;
+        }
+        .debug-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .warning {
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>物料查询功能调试页面</h1>
+        
+        <div class="debug-section">
+            <div class="debug-title">1. 检查页面元素</div>
+            <button class="debug-button" onclick="checkElements()">检查元素存在性</button>
+            <div id="element-check" class="debug-output"></div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-title">2. 测试API连接</div>
+            <button class="debug-button" onclick="testAPIDebug()">测试API连接</button>
+            <div id="api-test" class="debug-output"></div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-title">3. 模拟物料查询</div>
+            <textarea id="debug-input" placeholder="输入测试内容..." style="width: 100%; height: 80px; margin-bottom: 10px;"></textarea>
+            <button class="debug-button" onclick="simulateMaterialQuery()">模拟查询</button>
+            <div id="query-test" class="debug-output"></div>
+        </div>
+        
+        <div class="debug-section">
+            <div class="debug-title">4. 控制台日志</div>
+            <button class="debug-button" onclick="clearLogs()">清空日志</button>
+            <button class="debug-button" onclick="exportLogs()">导出日志</button>
+            <div id="console-logs" class="debug-output"></div>
+        </div>
+    </div>
+
+    <script>
+        // 重写console.log来捕获日志
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const logs = [];
+        
+        function captureLog(level, args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = Array.from(args).map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            logs.push({ timestamp, level, message });
+            updateLogDisplay();
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            captureLog('log', args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            captureLog('error', args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            captureLog('warn', args);
+        };
+        
+        function updateLogDisplay() {
+            const logContainer = document.getElementById('console-logs');
+            logContainer.innerHTML = logs.slice(-20).map(log => 
+                `<div class="${log.level}">[${log.timestamp}] ${log.message}</div>`
+            ).join('');
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function checkElements() {
+            const output = document.getElementById('element-check');
+            const checks = [
+                { name: 'material-workflow-page', id: 'material-workflow-page' },
+                { name: 'material-input', id: 'material-input' },
+                { name: 'material-result', id: 'material-result' },
+                { name: 'pricing-workflow-page', id: 'pricing-workflow-page' },
+                { name: 'pricing-input', id: 'pricing-input' },
+                { name: 'pricing-result', id: 'pricing-result' }
+            ];
+            
+            let result = '元素检查结果:\n';
+            checks.forEach(check => {
+                const element = document.getElementById(check.id);
+                const exists = !!element;
+                const visible = exists ? element.style.display !== 'none' : false;
+                result += `${check.name}: ${exists ? '✅存在' : '❌不存在'}`;
+                if (exists) {
+                    result += ` (${visible ? '可见' : '隐藏'})`;
+                }
+                result += '\n';
+            });
+            
+            output.textContent = result;
+        }
+        
+        async function testAPIDebug() {
+            const output = document.getElementById('api-test');
+            output.textContent = '正在测试API连接...';
+            
+            try {
+                const config = {
+                    baseUrl: 'https://api.coze.cn/v1/workflow/run',
+                    token: 'pat_ZiVGbB5siln3M8TWCLEvAuq63ugpMc6meCoWe9jTnivP7fzu1g6fPVv5uVPZ1AMi',
+                    workflowId: '7553278219114971136'
+                };
+                
+                const response = await fetch(config.baseUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${config.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        workflow_id: config.workflowId,
+                        parameters: {
+                            input_text: "API连接测试"
+                        }
+                    })
+                });
+                
+                const result = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                };
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    result.data = data;
+                }
+                
+                output.textContent = `API测试结果:\n${JSON.stringify(result, null, 2)}`;
+                
+            } catch (error) {
+                output.textContent = `API测试失败:\n${error.message}\n${error.stack}`;
+            }
+        }
+        
+        function simulateMaterialQuery() {
+            const input = document.getElementById('debug-input').value.trim();
+            const output = document.getElementById('query-test');
+            
+            if (!input) {
+                output.textContent = '请输入测试内容';
+                return;
+            }
+            
+            output.textContent = `模拟物料查询:\n输入: ${input}\n正在处理...`;
+            
+            // 模拟API调用
+            setTimeout(() => {
+                const mockResult = {
+                    success: true,
+                    data: {
+                        output: [{
+                            outputList: [
+                                {
+                                    uid: "12345",
+                                    medicine_name: "测试药品",
+                                    specification: "10mg",
+                                    manufacturers: "测试厂家",
+                                    goods_buyer: "采购员A",
+                                    approval_number: "国药准字H12345678",
+                                    international_code: "1234567890123",
+                                    commonly_name: "通用名",
+                                    medicine_type: "片剂"
+                                }
+                            ]
+                        }]
+                    }
+                };
+                
+                output.textContent = `模拟查询完成:\n${JSON.stringify(mockResult, null, 2)}`;
+            }, 2000);
+        }
+        
+        function clearLogs() {
+            logs.length = 0;
+            updateLogDisplay();
+        }
+        
+        function exportLogs() {
+            const logText = logs.map(log => 
+                `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`
+            ).join('\n');
+            
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `debug-logs-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 页面加载完成后自动检查元素
+        window.addEventListener('load', () => {
+            setTimeout(checkElements, 1000);
+        });
+    </script>
+</body>
+</html>

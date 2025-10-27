@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>噼里啪啦小助手 - 工作流处理器</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部标题 -->
+        <header class="header">
+            <h1 class="title">噼里啪啦小助手</h1>
+            <p class="subtitle">智能工作流处理器</p>
+            <!-- 导航按钮 -->
+            <div class="nav-buttons" id="nav-buttons" style="display: none;">
+                <button class="btn btn-secondary" onclick="showMainMenu()">
+                    <span class="btn-icon">🏠</span>
+                    返回主页
+                </button>
+            </div>
+        </header>
+
+        <!-- 主导航界面 -->
+        <div class="main-menu" id="main-menu">
+            <div class="menu-grid">
+                <div class="menu-card" onclick="openWorkflowPage('pricing')">
+                    <div class="menu-icon">💰</div>
+                    <h3 class="menu-title">想知道物料单体报价吗，点我</h3>
+                    <p class="menu-description">通过扣子工作流API处理您的文本内容，提供智能化的内容分析和报价服务</p>
+                    <div class="menu-arrow">→</div>
+                </div>
+                
+
+                
+                <div class="menu-card" onclick="openWorkflowPage('material')">
+                    <div class="menu-icon">📦</div>
+                    <h3 class="menu-title">简单物料查询</h3>
+                    <p class="menu-description">通过扣子工作流API处理物料查询需求，提供智能化的物料信息分析服务</p>
+                    <div class="menu-arrow">→</div>
+                </div>
+                
+                <div class="menu-card" onclick="openWorkflowPage('excel')">
+                    <div class="menu-icon">📊</div>
+                    <h3 class="menu-title">报价Excel匹配</h3>
+                    <p class="menu-description">上传Excel文件到扣子工作流，进行智能化的报价匹配和数据分析处理</p>
+                    <div class="menu-arrow">→</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 报价查询工作流独立界面 -->
+        <div class="pricing-workflow-page" id="pricing-workflow-page" style="display: none;">
+            <div class="workflow-container">
+                <div class="single-workflow">
+                    <div class="workflow-header">
+                        <h1>想知道报价吗，点我点我点我！</h1>
+                    </div>
+                    <div class="workflow-content">
+                        <div class="workflow-description">
+                            <p>通过扣子工作流API处理您的文本内容，提供智能化的内容分析和处理服务</p>
+                        </div>
+                        <div class="input-section">
+                            <textarea placeholder="请输入文字内容..." class="text-input" id="pricing-input"></textarea>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="processWorkflow('pricing')">
+                                <span class="btn-icon">⚡</span>
+                                处理工作流
+                            </button>
+                        </div>
+                    </div>
+                    <div class="result-area" id="pricing-result" style="display: none;">
+                        <div class="result-header">
+                            <h3>处理结果</h3>
+                            <button class="btn btn-view" onclick="viewDetailedResult('pricing')" title="查看详细结果">
+                                <span class="btn-icon">👁️</span>
+                                详细查看
+                            </button>
+                        </div>
+                        <div class="result-content"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-secondary" onclick="copyResult('pricing')">复制</button>
+                            <button class="btn btn-secondary" onclick="downloadResult('pricing')">下载</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 简单物料查询工作流独立界面 -->
+        <div class="material-workflow-page" id="material-workflow-page" style="display: none;">
+            <div class="workflow-container">
+                <div class="single-workflow">
+                    <div class="workflow-header">
+                        <h1>简单物料查询</h1>
+                    </div>
+                    <div class="workflow-content">
+                        <div class="workflow-description">
+                            <p>通过扣子工作流API处理物料查询需求，提供智能化的物料信息分析服务</p>
+                        </div>
+                        <div class="input-section">
+                            <textarea placeholder="请输入物料查询内容..." class="text-input" id="material-input"></textarea>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="processWorkflow('material')">
+                                <span class="btn-icon">⚡</span>
+                                处理工作流
+                            </button>
+                        </div>
+                    </div>
+                    <div class="result-area" id="material-result" style="display: none;">
+                        <div class="result-header">
+                            <h3>处理结果</h3>
+                            <button class="btn btn-view" onclick="viewDetailedResult('material')" title="查看详细结果">
+                                <span class="btn-icon">👁️</span>
+                                详细查看
+                            </button>
+                        </div>
+                        <div class="result-content"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-secondary" onclick="copyResult('material')">复制</button>
+                            <button class="btn btn-secondary" onclick="downloadResult('material')">下载</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 报价Excel匹配工作流独立界面 -->
+        <div class="excel-workflow-page" id="excel-workflow-page" style="display: none;">
+            <div class="workflow-container">
+                <div class="single-workflow">
+                    <div class="workflow-header">
+                        <h1>报价Excel匹配</h1>
+                    </div>
+                    <div class="workflow-content">
+                        <div class="workflow-description">
+                            <p>上传Excel文件到扣子工作流，进行智能化的报价匹配和数据分析处理</p>
+                        </div>
+                        <div class="file-upload-section">
+                            <div class="upload-zone" id="excel-upload-zone" onclick="document.getElementById('excel-file-input').click()">
+                                <div class="upload-icon">📊</div>
+                                <p class="upload-text">点击选择Excel文件或拖拽文件到此处</p>
+                                <p class="upload-hint">支持 .xlsx, .xls 格式文件</p>
+                                <input type="file" id="excel-file-input" accept=".xlsx,.xls" style="display: none;" onchange="handleExcelFileSelect(event)">
+                            </div>
+                            <div class="file-info" id="excel-file-info" style="display: none;">
+                                <div class="file-details">
+                                    <span class="file-name"></span>
+                                    <span class="file-size"></span>
+                                </div>
+                                <button class="btn btn-secondary btn-small" onclick="clearExcelFile()">
+                                    <span class="btn-icon">🗑️</span>
+                                    清除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="excel-process-btn" onclick="processExcelWorkflow()" disabled>
+                                <span class="btn-icon">⚡</span>
+                                处理Excel文件
+                            </button>
+                        </div>
+                    </div>
+                    <div class="result-area" id="excel-result" style="display: none;">
+                        <div class="result-header">
+                            <h3>处理结果</h3>
+                            <button class="btn btn-view" onclick="viewDetailedResult('excel')" title="查看详细结果">
+                                <span class="btn-icon">👁️</span>
+                                详细查看
+                            </button>
+                        </div>
+                        <div class="result-content"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-secondary" onclick="copyResult('excel')">复制</button>
+                            <button class="btn btn-secondary" onclick="downloadResult('excel')">下载</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 全局操作区域 -->
+        <div class="global-actions" id="global-actions" style="display: none;">
+            <button class="btn btn-primary" onclick="downloadAllResults()">
+                <span class="btn-icon">📦</span>
+                批量下载所有结果
+            </button>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>&copy; 2025 噼里啪啦小助手 - 智能工作流处理器</p>
+        </footer>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>正在处理中...</p>
+        </div>
+    </div>
+
+    <!-- 详细结果查看弹窗 -->
+    <div id="result-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">详细处理结果</h2>
+                <button class="modal-close" onclick="closeResultModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-result-content" class="formatted-result"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="copyModalResult()">复制全部</button>
+                <button class="btn btn-secondary" onclick="downloadModalResult()">下载</button>
+                <button class="btn btn-primary" onclick="closeResultModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+    <div id="modal-overlay" class="modal-overlay" onclick="closeResultModal()" style="display: none;"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
