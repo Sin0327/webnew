@@ -1884,6 +1884,12 @@ body.modal-open {
     padding: 0 1rem;
 }
 
+/* 物料查询页面容器优化 */
+.material-workflow-page .workflow-container {
+    max-width: 95%;
+    padding: 0 0.5rem;
+}
+
 .single-workflow {
     max-width: none;
     margin: 0;
@@ -1990,8 +1996,8 @@ body.modal-open {
 .material-table-container {
     width: 100%;
     overflow-x: auto;
-    margin: 1rem 0;
-    border-radius: 12px;
+    margin: 0.5rem 0;
+    border-radius: 8px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-secondary);
@@ -2000,9 +2006,26 @@ body.modal-open {
 .material-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     background: transparent;
-    min-width: 1200px; /* 确保表格有足够宽度 */
+    min-width: 1400px; /* 增加最小宽度以适应更多列 */
+}
+
+/* 针对物料查询页面的特殊优化 */
+.material-workflow-page .material-table-container {
+    margin: 0.3rem 0;
+    max-width: 100%;
+}
+
+.material-workflow-page .material-table {
+    font-size: 0.8rem;
+    min-width: 1600px; /* 物料查询页面需要更宽的表格 */
+}
+
+.material-workflow-page .result-content {
+    max-height: 70vh; /* 限制最大高度 */
+    overflow-y: auto;
+    padding: 0.8rem;
 }
 
 .material-table thead {
@@ -2013,14 +2036,20 @@ body.modal-open {
 }
 
 .material-table thead th {
-    padding: 1rem 0.75rem;
+    padding: 0.8rem 0.6rem;
     text-align: left;
     font-weight: 600;
     color: var(--text-primary);
     border-bottom: 2px solid var(--border-color);
     white-space: nowrap;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 物料查询页面表头优化 */
+.material-workflow-page .material-table thead th {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.75rem;
 }
 
 .material-table tbody tr {
@@ -2043,12 +2072,19 @@ body.modal-open {
 }
 
 .material-table tbody td {
-    padding: 0.75rem;
+    padding: 0.6rem 0.5rem;
     color: var(--text-secondary);
     border-right: 1px solid rgba(61, 71, 89, 0.3);
     vertical-align: middle;
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+/* 物料查询页面数据行优化 */
+.material-workflow-page .material-table tbody td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
 }
 
 .material-table tbody td:last-child {
@@ -2156,12 +2192,75 @@ body.modal-open {
 /* 增强版表格样式（用于详细查看模态框） */
 .enhanced-material-table-container {
     width: 100%;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
     background: var(--bg-card);
-    border-radius: 12px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-secondary);
     overflow: hidden;
+}
+
+/* 物料查询详细查看专用优化 */
+.modal-content[data-type="material"] .enhanced-material-table-container {
+    margin: 0.3rem 0;
+    border-radius: 6px;
+}
+
+.modal-content[data-type="material"] .modal-body {
+    padding: 1rem 1.5rem;
+}
+
+.modal-content[data-type="material"] .enhanced-material-table {
+    font-size: 0.75rem;
+    min-width: 1600px;
+}
+
+.modal-content[data-type="material"] .enhanced-material-table thead th {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.7rem;
+}
+
+.modal-content[data-type="material"] .enhanced-material-table tbody td {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+}
+
+
+
+/* 物料查询详细查看UID复制区域优化 */
+.modal-content[data-type="material"] .uid-copy-controls {
+    padding: 1rem 1.5rem;
+}
+
+.modal-content[data-type="material"] .uid-copy-controls h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+}
+
+.modal-content[data-type="material"] .uid-copy-buttons {
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.modal-content[data-type="material"] .uid-copy-buttons .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.modal-content[data-type="material"] .uid-copy-instructions {
+    padding: 0.8rem;
+    margin-top: 0.8rem;
+}
+
+.modal-content[data-type="material"] .uid-copy-instructions p {
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+}
+
+.modal-content[data-type="material"] .uid-copy-instructions li {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
 }
 
 /* UID复制功能区域 */
@@ -3119,4 +3218,320 @@ body.modal-open {
     color: var(--text-color);
     line-height: 1.4;
     padding: 12px 8px;
+}
+
+/* 物料查询详细查看表格列宽优化 - 放在最后确保优先级 */
+/* 物料查询详细查看表格 - 紧凑列宽设置 */
+
+/* 强制表格使用固定布局 */
+.modal-content[data-type="material"] .enhanced-material-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+/* 更强的选择器优先级 */
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(5),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(5) {
+    width: 45px !important; /* 采购员 - 更紧凑 */
+    min-width: 45px !important;
+    max-width: 45px !important;
+    padding: 4px 2px !important;
+}
+
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(6),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(6) {
+    width: 50px !important; /* 考核价 - 更紧凑 */
+    min-width: 50px !important;
+    max-width: 50px !important;
+    padding: 4px 2px !important;
+}
+
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(7),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(7) {
+    width: 50px !important; /* 特定价 - 更紧凑 */
+    min-width: 50px !important;
+    max-width: 50px !important;
+    padding: 4px 2px !important;
+}
+
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(8),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(8) {
+    width: 45px !important; /* 库存数 - 更紧凑 */
+    min-width: 45px !important;
+    max-width: 45px !important;
+    padding: 4px 2px !important;
+}
+
+/* 相关政策 - 第11列，加宽 */
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(11),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(11) {
+    width: 200px !important; /* 相关政策 - 大幅增加宽度 */
+    min-width: 200px !important;
+    max-width: 200px !important;
+}
+
+/* 品类 - 第12列，容纳8个中文字 */
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(12),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(12) {
+    width: 96px !important; /* 品类 - 8个中文字约96px */
+    min-width: 96px !important;
+    max-width: 96px !important;
+}
+
+/* 到货日期 - 第15列，与生产日期一致 */
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(15),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(15) {
+    width: 70px !important; /* 到货日期 - 与生产日期一致（70px） */
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+
+/* 到货数量 - 第16列，与生产日期一致 */
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table th:nth-child(16),
+div.modal-content[data-type="material"] .enhanced-material-table-container .enhanced-material-table td:nth-child(16) {
+    width: 70px !important; /* 到货数量 - 与生产日期一致（70px） */
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+.modal.show .modal-content[data-type="material"] .enhanced-material-table th:nth-child(5),
+.modal.show .modal-content[data-type="material"] .enhanced-material-table td:nth-child(5) {
+    width: 45px !important; /* 采购员 - 更紧凑 */
+    min-width: 45px !important;
+    max-width: 45px !important;
+}
+
+.modal.show .modal-content[data-type="material"] .enhanced-material-table th:nth-child(6),
+.modal.show .modal-content[data-type="material"] .enhanced-material-table td:nth-child(6) {
+    width: 50px !important; /* 考核价 - 更紧凑 */
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+.modal.show .modal-content[data-type="material"] .enhanced-material-table th:nth-child(7),
+.modal.show .modal-content[data-type="material"] .enhanced-material-table td:nth-child(7) {
+    width: 50px !important; /* 特定价 - 更紧凑 */
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+.modal.show .modal-content[data-type="material"] .enhanced-material-table th:nth-child(8),
+.modal.show .modal-content[data-type="material"] .enhanced-material-table td:nth-child(8) {
+    width: 45px !important; /* 库存数 - 更紧凑 */
+    min-width: 45px !important;
+    max-width: 45px !important;
+}
+
+/* 旧的CSS规则已删除，使用上面更强的选择器 */
+
+/* 相关政策列的可点击样式 */
+.enhanced-material-table .policy-cell {
+    cursor: pointer;
+    color: #1976d2;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.enhanced-material-table .policy-cell:hover {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    text-decoration: underline;
+}
+
+.enhanced-material-table .policy-cell:active {
+    background-color: #bbdefb;
+}
+
+/* 政策详情弹窗样式 */
+.policy-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.policy-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.policy-modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    transform: scale(0.7);
+    transition: transform 0.3s ease;
+}
+
+.policy-modal.show .policy-modal-content {
+    transform: scale(1);
+}
+
+.policy-modal-header {
+    background: #1976d2;
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.policy-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.policy-modal-close {
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.policy-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.policy-modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.policy-modal-body p {
+    margin: 0;
+    line-height: 1.6;
+    color: #333;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+/* Markdown表格样式 */
+.markdown-table-container {
+    margin: 15px 0;
+    overflow-x: auto;
+}
+
+.markdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.markdown-table th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.markdown-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #333;
+}
+
+.markdown-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.markdown-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 报价建议部分样式 */
+.pricing-quote-suggestions {
+    margin: 20px 0;
+}
+
+.pricing-quote-suggestions .section-header {
+    margin-bottom: 15px;
+}
+
+.quote-additional-info {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.quote-additional-info p {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: #333;
+}
+
+.quote-additional-info p:first-child {
+    margin-top: 0;
+}
+
+.quote-additional-info p:last-child {
+    margin-bottom: 0;
+}
+
+/* 风险与机会部分样式 */
+.pricing-risk-opportunities {
+    margin: 20px 0;
+}
+
+.pricing-risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-risk-table td.label {
+    background: #fff3cd;
+    font-weight: 600;
+    color: #856404;
+    width: 120px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ffeaa7;
+}
+
+.pricing-risk-table td.value {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    line-height: 1.6;
+}
+
+.pricing-risk-table td.full-width {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    line-height: 1.6;
+}
+
+.pricing-risk-table tr:last-child td {
+    border-bottom: none;
 }

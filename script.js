@@ -1235,8 +1235,8 @@ function calculateQuotePrice(material) {
         return null;
     }
     
-    // 1. 基础报价计算：考核价 / 0.96
-    let baseQuote = assessmentPrice / 0.96;
+    // 1. 基础报价计算：考核价 / 0.975
+    let baseQuote = assessmentPrice / 0.975;
     
     // 2. 特殊舍入规则：保留两位小数
     baseQuote = applySpecialRounding(baseQuote);
@@ -1544,11 +1544,11 @@ function formatMaterialTable(materials) {
         { header: '物料名称', field: 'medicine_name' },
         { header: '规格', field: 'specification' },
         { header: '生产厂家', field: 'manufacturers' },
-        { header: '采购员', field: 'goods_buyer' },
-        { header: '批准文号', field: 'approval_number' },
-        { header: '国际条形码', field: 'international_code' },
-        { header: '商品名', field: 'commonly_name' },
-        { header: '药剂类型', field: 'medicine_type' }
+        { header: '采购员', field: 'buyer' },
+        { header: '考核价', field: 'price' },
+        { header: '特定价', field: 'specific_price' },
+        { header: '库存', field: 'inventory_quantity' },
+        { header: '禁限销', field: 'prohibited_sell' }
     ];
     
     console.log('formatMaterialTable: 第一条数据示例:', materials[0]);
@@ -1795,7 +1795,7 @@ function formatSingleProductData(content, productIndex = 0) {
         productHTML += '<div class="section-header">\n';
         productHTML += '<h4><span class="section-icon">📋</span>基本信息</h4>\n';
         productHTML += '</div>\n';
-        productHTML += '<table class="pricing-info-table">\n';
+        productHTML += '<table class="pricing-risk-table">\n';
         productHTML += '<tbody>\n';
         
         if (basicInfo.id) productHTML += `<tr><td class="label">ID</td><td class="value">${basicInfo.id}</td></tr>\n`;
@@ -1814,7 +1814,7 @@ function formatSingleProductData(content, productIndex = 0) {
             productHTML += '<div class="section-header">\n';
             productHTML += '<h4><span class="section-icon">📊</span>销售数据概况</h4>\n';
             productHTML += '</div>\n';
-            productHTML += '<table class="pricing-data-table">\n';
+            productHTML += '<table class="pricing-risk-table">\n';
             productHTML += '<tbody>\n';
             
             // 去重并处理销售数据
@@ -1858,7 +1858,7 @@ function formatSingleProductData(content, productIndex = 0) {
             productHTML += '<div class="section-header">\n';
             productHTML += '<h4><span class="section-icon">🔍</span>分析</h4>\n';
             productHTML += '</div>\n';
-            productHTML += '<table class="pricing-analysis-table">\n';
+            productHTML += '<table class="pricing-risk-table">\n';
             productHTML += '<tbody>\n';
             
             // 去重并处理分析数据
@@ -1869,6 +1869,111 @@ function formatSingleProductData(content, productIndex = 0) {
                 console.log(`formatSingleProductData: 处理分析数据 ${index + 1}:`, item);
                 
                 // 解析键值对 (支持中英文冒号)
+                const chineseColonIndex = item.indexOf('：');
+                const englishColonIndex = item.indexOf(':');
+                let colonIndex = -1;
+                
+                if (chineseColonIndex > 0 && englishColonIndex > 0) {
+                    colonIndex = Math.min(chineseColonIndex, englishColonIndex);
+                } else if (chineseColonIndex > 0) {
+                    colonIndex = chineseColonIndex;
+                } else if (englishColonIndex > 0) {
+                    colonIndex = englishColonIndex;
+                }
+                
+                if (colonIndex > 0) {
+                    const key = item.substring(0, colonIndex).replace(/\*+/g, '').trim();
+                    const value = item.substring(colonIndex + 1).trim();
+                    productHTML += `<tr><td class="label">${key}</td><td class="value">${value}</td></tr>\n`;
+                } else {
+                    productHTML += `<tr><td colspan="2" class="full-width">${item}</td></tr>\n`;
+                }
+            });
+            
+            productHTML += '</tbody>\n</table>\n</div>\n';
+            
+            // 添加分隔线
+            productHTML += '<div class="section-divider"></div>\n';
+        }
+        
+        // 报价建议表格（包含Markdown表格处理）
+        if (quoteSuggestions.length > 0) {
+            productHTML += '<div class="pricing-quote-suggestions">\n';
+            productHTML += '<div class="section-header">\n';
+            productHTML += '<h4><span class="section-icon">💰</span>报价建议</h4>\n';
+            productHTML += '</div>\n';
+            
+            // 检查是否包含Markdown表格
+            const markdownTableContent = quoteSuggestions.join('\n');
+            const markdownTableHTML = parseMarkdownTable(markdownTableContent);
+            
+            if (markdownTableHTML) {
+                // 如果成功解析了Markdown表格，显示表格
+                productHTML += markdownTableHTML;
+                
+                // 显示其他非表格内容
+                const nonTableContent = quoteSuggestions.filter(item => 
+                    !item.includes('|') && !item.includes('---') && item.trim() !== ''
+                );
+                
+                if (nonTableContent.length > 0) {
+                    productHTML += '<div class="quote-additional-info">\n';
+                    nonTableContent.forEach(item => {
+                        const cleanItem = item.replace(/^[-*•]\s*/, '').replace(/\*+/g, '').trim();
+                        if (cleanItem) {
+                            productHTML += `<p>${cleanItem}</p>\n`;
+                        }
+                    });
+                    productHTML += '</div>\n';
+                }
+            } else {
+                // 如果没有Markdown表格，按原来的方式处理
+                productHTML += '<table class="pricing-risk-table">\n';
+                productHTML += '<tbody>\n';
+                
+                const uniqueQuoteData = [...new Set(quoteSuggestions)];
+                uniqueQuoteData.forEach((item, index) => {
+                    const chineseColonIndex = item.indexOf('：');
+                    const englishColonIndex = item.indexOf(':');
+                    let colonIndex = -1;
+                    
+                    if (chineseColonIndex > 0 && englishColonIndex > 0) {
+                        colonIndex = Math.min(chineseColonIndex, englishColonIndex);
+                    } else if (chineseColonIndex > 0) {
+                        colonIndex = chineseColonIndex;
+                    } else if (englishColonIndex > 0) {
+                        colonIndex = englishColonIndex;
+                    }
+                    
+                    if (colonIndex > 0) {
+                        const key = item.substring(0, colonIndex).replace(/\*+/g, '').trim();
+                        const value = item.substring(colonIndex + 1).trim();
+                        productHTML += `<tr><td class="label">${key}</td><td class="value">${value}</td></tr>\n`;
+                    } else {
+                        productHTML += `<tr><td colspan="2" class="full-width">${item}</td></tr>\n`;
+                    }
+                });
+                
+                productHTML += '</tbody>\n</table>\n';
+            }
+            
+            productHTML += '</div>\n';
+            
+            // 添加分隔线
+            productHTML += '<div class="section-divider"></div>\n';
+        }
+        
+        // 风险与机会表格
+        if (riskOpportunities.length > 0) {
+            productHTML += '<div class="pricing-risk-opportunities">\n';
+            productHTML += '<div class="section-header">\n';
+            productHTML += '<h4><span class="section-icon">⚠️</span>风险与机会</h4>\n';
+            productHTML += '</div>\n';
+            productHTML += '<table class="pricing-risk-table">\n';
+            productHTML += '<tbody>\n';
+            
+            const uniqueRiskData = [...new Set(riskOpportunities)];
+            uniqueRiskData.forEach((item, index) => {
                 const chineseColonIndex = item.indexOf('：');
                 const englishColonIndex = item.indexOf(':');
                 let colonIndex = -1;
@@ -2541,18 +2646,18 @@ function formatEnhancedMaterialTable(materials) {
         { header: '物料名称', field: 'medicine_name' },
         { header: '规格', field: 'specification' },
         { header: '生产厂家', field: 'manufacturers' },
-        { header: '供应商', field: 'vendor' },
-        { header: '采购员', field: 'goods_buyer' },
-        { header: '批准文号', field: 'approval_number' },
-        { header: '国际条形码', field: 'international_code' },
-        { header: '商品名', field: 'commonly_name' },
-        { header: '药剂类型', field: 'medicine_type' },
-        { header: '剂型描述', field: 'dosage_description' },
-        { header: '标签名称', field: 'label_name' },
-        { header: '库存位置', field: 'inventory_location' },
-        { header: '库存数量', field: 'inventory_quantity' },
-        { header: '生产日期', field: 'manufacture_date' },
-        { header: '有效期', field: 'expiration_date' }
+        { header: '采购员', field: 'buyer' },
+        { header: '考核价', field: 'price' },
+        { header: '特定价', field: 'specific_price' },
+        { header: '库存数', field: 'inventory_quantity' },
+        { header: '生产日期', field: 'date_manufacture' },
+        { header: '有效期', field: 'expirationdate' },
+        { header: '相关政策', field: 'giveaway_description' },
+        { header: '品类', field: 'product_description' },
+        { header: '线上销售情况', field: 'online_logo' },
+        { header: '追溯码', field: 'traceability_code' },
+        { header: '到货日期', field: 'arrival_date' },
+        { header: '到货数量', field: 'unstocked_quantity' }
     ];
     
     // 创建HTML表格容器
@@ -2596,6 +2701,10 @@ function formatEnhancedMaterialTable(materials) {
             const value = material[col.field] || '';
             if (col.isUid) {
                 tableHTML += `<td class="uid-cell" data-uid="${value}" onclick="toggleUidSelection(this, event)">${value}</td>\n`;
+            } else if (col.field === 'giveaway_description') {
+                // 相关政策列添加点击放大功能
+                const truncatedValue = value.length > 20 ? value.substring(0, 20) + '...' : value;
+                tableHTML += `<td class="policy-cell" data-full-content="${value}" onclick="showPolicyDetail(this)" title="点击查看完整内容">${truncatedValue}</td>\n`;
             } else {
                 tableHTML += `<td>${value}</td>\n`;
             }
@@ -3722,7 +3831,13 @@ function viewDetailedResult(type) {
     modalContent.innerHTML = modalContentHtml;
 
     // 显示弹窗
-    document.getElementById('result-modal').style.display = 'block';
+    const modal = document.getElementById('result-modal');
+    
+    // 为模态框内容添加类型标识，用于特定样式
+    const modalContentElement = modal.querySelector('.modal-content');
+    modalContentElement.setAttribute('data-type', type);
+    
+    modal.style.display = 'block';
     document.getElementById('modal-overlay').style.display = 'block';
     document.body.classList.add('modal-open'); // 防止背景滚动并确保全屏显示
     
@@ -4487,7 +4602,13 @@ function formatGeneralContent(content) {
 
 // 关闭弹窗
 function closeResultModal() {
-    document.getElementById('result-modal').style.display = 'none';
+    const modal = document.getElementById('result-modal');
+    const modalContent = modal.querySelector('.modal-content');
+    
+    // 清除类型标识
+    modalContent.removeAttribute('data-type');
+    
+    modal.style.display = 'none';
     document.getElementById('modal-overlay').style.display = 'none';
     document.body.classList.remove('modal-open'); // 恢复背景滚动
 }
@@ -5059,5 +5180,212 @@ function testExcelWorkflowData() {
     console.log('🧪 测试完成，请检查Excel工作流页面的处理结果区域');
 }
 
+// 显示相关政策详细内容的函数
+function showPolicyDetail(cell) {
+    const fullContent = cell.getAttribute('data-full-content');
+    
+    if (!fullContent || fullContent.trim() === '') {
+        alert('该项目暂无相关政策信息');
+        return;
+    }
+    
+    // 创建弹窗容器
+    const modal = document.createElement('div');
+    modal.className = 'policy-modal';
+    modal.innerHTML = `
+        <div class="policy-modal-content">
+            <div class="policy-modal-header">
+                <h3>相关政策详情</h3>
+                <span class="policy-modal-close" onclick="closePolicyModal()">&times;</span>
+            </div>
+            <div class="policy-modal-body">
+                <p>${fullContent}</p>
+            </div>
+        </div>
+    `;
+    
+    // 添加到页面
+    document.body.appendChild(modal);
+    
+    // 显示弹窗
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+// 关闭政策详情弹窗
+function closePolicyModal() {
+    const modal = document.querySelector('.policy-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(modal);
+        }, 300);
+    }
+}
+
 // 将测试函数暴露到全局
 window.testExcelWorkflowData = testExcelWorkflowData;
+
+// 解析Markdown表格为HTML表格
+function parseMarkdownTable(content) {
+    console.log('parseMarkdownTable: 开始解析Markdown表格');
+    console.log('parseMarkdownTable: 内容预览:', content.substring(0, 200));
+    
+    if (!content || typeof content !== 'string') {
+        return null;
+    }
+    
+    // 查找表格行
+    const lines = content.split('\n');
+    const tableLines = [];
+    let inTable = false;
+    
+    for (let line of lines) {
+        line = line.trim();
+        
+        // 检测表格开始（包含管道符的行）
+        if (line.includes('|') && !line.startsWith('---')) {
+            inTable = true;
+            tableLines.push(line);
+        } 
+        // 检测表格分隔符行
+        else if (line.includes('---') && line.includes('|')) {
+            // 跳过分隔符行，但保持在表格状态
+            continue;
+        }
+        // 如果在表格中但当前行不包含管道符，表格结束
+        else if (inTable && !line.includes('|')) {
+            break;
+        }
+    }
+    
+    if (tableLines.length === 0) {
+        console.log('parseMarkdownTable: 未找到有效的表格行');
+        return null;
+    }
+    
+    console.log('parseMarkdownTable: 找到', tableLines.length, '行表格数据');
+    
+    // 解析表格
+    const rows = [];
+    let headers = [];
+    
+    tableLines.forEach((line, index) => {
+        // 移除首尾的管道符并分割
+        const cells = line.replace(/^\||\|$/g, '').split('|').map(cell => cell.trim());
+        
+        if (index === 0) {
+            // 第一行作为表头
+            headers = cells;
+        } else {
+            // 其他行作为数据行
+            rows.push(cells);
+        }
+    });
+    
+    if (headers.length === 0 || rows.length === 0) {
+        console.log('parseMarkdownTable: 表格数据不完整');
+        return null;
+    }
+    
+    // 生成HTML表格
+    let html = '<div class="markdown-table-container">\n';
+    html += '<table class="markdown-table">\n';
+    
+    // 表头
+    html += '<thead>\n<tr>\n';
+    headers.forEach(header => {
+        const cleanHeader = header.replace(/\*+/g, '').trim();
+        html += `<th>${cleanHeader}</th>\n`;
+    });
+    html += '</tr>\n</thead>\n';
+    
+    // 表体
+    html += '<tbody>\n';
+    rows.forEach(row => {
+        html += '<tr>\n';
+        row.forEach((cell, cellIndex) => {
+            // 确保单元格数量与表头一致
+            if (cellIndex < headers.length) {
+                const cleanCell = cell.replace(/\*+/g, '').trim();
+                html += `<td>${cleanCell}</td>\n`;
+            }
+        });
+        html += '</tr>\n';
+    });
+    html += '</tbody>\n';
+    
+    html += '</table>\n</div>\n';
+    
+    console.log('parseMarkdownTable: 成功生成HTML表格');
+    return html;
+}
+
+// 预输入文本处理逻辑
+function initializePreInputHandlers() {
+    const singleLinePreInputText = '感冒灵颗粒';
+    const multiLinePreInputText = '感冒灵颗粒\n正骨水\n红霉素软膏 恒健';
+    const inputElements = [
+        { id: 'pricing-input', defaultText: singleLinePreInputText },
+        { id: 'material-input', defaultText: multiLinePreInputText }
+    ];
+    
+    inputElements.forEach(({ id, defaultText }) => {
+        const element = document.getElementById(id);
+        if (element) {
+            // 标记是否为预输入状态
+            element.isPreInput = true;
+            element.preInputText = defaultText;
+            
+            // 设置预输入文本和样式
+            element.value = defaultText;
+            element.style.color = '#999';
+            element.style.fontStyle = 'italic';
+            
+            // 点击事件 - 清除预输入文本
+            element.addEventListener('focus', function() {
+                if (this.isPreInput && this.value === this.preInputText) {
+                    this.value = '';
+                    this.style.color = '';
+                    this.style.fontStyle = '';
+                    this.isPreInput = false;
+                }
+            });
+            
+            // 失去焦点事件 - 如果为空则恢复预输入文本
+            element.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.value = this.preInputText;
+                    this.style.color = '#999';
+                    this.style.fontStyle = 'italic';
+                    this.isPreInput = true;
+                }
+            });
+            
+            // 输入事件 - 确保用户输入时清除预输入状态
+            element.addEventListener('input', function() {
+                if (this.isPreInput) {
+                    this.style.color = '';
+                    this.style.fontStyle = '';
+                    this.isPreInput = false;
+                }
+            });
+        }
+    });
+}
+
+// 页面加载完成后初始化预输入处理器
+document.addEventListener('DOMContentLoaded', function() {
+    initializePreInputHandlers();
+});
+
+// 为了确保在动态加载页面时也能工作，在显示工作流页面时重新初始化
+const originalOpenWorkflowPage = window.openWorkflowPage;
+if (originalOpenWorkflowPage) {
+    window.openWorkflowPage = function(type) {
+        originalOpenWorkflowPage(type);
+        // 延迟初始化，确保DOM已更新
+        setTimeout(initializePreInputHandlers, 100);
+    };
+}

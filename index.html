@@ -12,8 +12,8 @@
     <div class="container">
         <!-- 头部标题 -->
         <header class="header">
-            <h1 class="title">噼里啪啦小助手</h1>
-            <p class="subtitle">智能工作流处理器</p>
+            <h1 class="title">“噼里啪啦”小助手</h1>
+            <p class="subtitle">帮你减少频繁“噼里啪啦”打键盘的好助手！</p>
             <!-- 导航按钮 -->
             <div class="nav-buttons" id="nav-buttons" style="display: none;">
                 <button class="btn btn-secondary" onclick="showMainMenu()">
@@ -28,8 +28,8 @@
             <div class="menu-grid">
                 <div class="menu-card" onclick="openWorkflowPage('pricing')">
                     <div class="menu-icon">💰</div>
-                    <h3 class="menu-title">想知道物料单体报价吗，点我</h3>
-                    <p class="menu-description">通过扣子工作流API处理您的文本内容，提供智能化的内容分析和报价服务</p>
+                    <h3 class="menu-title">报价小顾问</h3>
+                    <p class="menu-description">对于首次报价又不知道如何提供命中高的报价，可以输入物料名、厂家来获取报价建议哦</p>
                     <div class="menu-arrow">→</div>
                 </div>
                 
@@ -37,15 +37,15 @@
                 
                 <div class="menu-card" onclick="openWorkflowPage('material')">
                     <div class="menu-icon">📦</div>
-                    <h3 class="menu-title">简单物料查询</h3>
-                    <p class="menu-description">通过扣子工作流API处理物料查询需求，提供智能化的物料信息分析服务</p>
+                    <h3 class="menu-title">物料查询</h3>
+                    <p class="menu-description">可以通过输入物料名、厂家来获取物料的详细信息：ID、名称、规格、考核价、特定价、效期等信息</p>
                     <div class="menu-arrow">→</div>
                 </div>
                 
                 <div class="menu-card" onclick="openWorkflowPage('excel')">
                     <div class="menu-icon">📊</div>
-                    <h3 class="menu-title">报价Excel匹配</h3>
-                    <p class="menu-description">上传Excel文件到扣子工作流，进行智能化的报价匹配和数据分析处理</p>
+                    <h3 class="menu-title">Excel报价（500条行信息内）匹配出报价</h3>
+                    <p class="menu-description">上传Excel文件进行报价（4%和特定价做比对）</p>
                     <div class="menu-arrow">→</div>
                 </div>
             </div>
@@ -56,11 +56,11 @@
             <div class="workflow-container">
                 <div class="single-workflow">
                     <div class="workflow-header">
-                        <h1>想知道报价吗，点我点我点我！</h1>
+                        <h1>报价小顾问！</h1>
                     </div>
                     <div class="workflow-content">
                         <div class="workflow-description">
-                            <p>通过扣子工作流API处理您的文本内容，提供智能化的内容分析和处理服务</p>
+                            <p>对于首次报价又不知道如何提供命中高的报价，可以输入物料名、厂家来获取报价建议哦（以下预输入：感冒灵颗粒，可直接运行）</p>
                         </div>
                         <div class="input-section">
                             <textarea placeholder="请输入文字内容..." class="text-input" id="pricing-input"></textarea>
@@ -95,11 +95,11 @@
             <div class="workflow-container">
                 <div class="single-workflow">
                     <div class="workflow-header">
-                        <h1>简单物料查询</h1>
+                        <h1>物料查询</h1>
                     </div>
                     <div class="workflow-content">
                         <div class="workflow-description">
-                            <p>通过扣子工作流API处理物料查询需求，提供智能化的物料信息分析服务</p>
+                            <p>可以通过输入物料名、厂家来获取物料的详细信息：ID、名称、规格、考核价、特定价、效期等信息（以下预输入：感冒灵颗粒等信息，可直接运行）</p>
                         </div>
                         <div class="input-section">
                             <textarea placeholder="请输入物料查询内容..." class="text-input" id="material-input"></textarea>
@@ -134,11 +134,11 @@
             <div class="workflow-container">
                 <div class="single-workflow">
                     <div class="workflow-header">
-                        <h1>报价Excel匹配</h1>
+                        <h1>Excel报价（500条行信息内）匹配出报价</h1>
                     </div>
                     <div class="workflow-content">
                         <div class="workflow-description">
-                            <p>上传Excel文件到扣子工作流，进行智能化的报价匹配和数据分析处理</p>
+                            <p>报价逻辑是：4%点为基准，如果上次销售时间在3个月内，则用上次销售价格作为报价，特定价如果大于4%点，则用特定价作为报价</p>
                         </div>
                         <div class="file-upload-section">
                             <div class="upload-zone" id="excel-upload-zone" onclick="document.getElementById('excel-file-input').click()">
