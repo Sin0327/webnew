@@ -488,7 +488,7 @@ function readFileContent(file) {
 const COZE_API_CONFIG = {
     baseUrl: 'https://api.coze.cn/v1/workflow/run',
     fileUploadUrl: 'https://api.coze.cn/v1/files/upload',
-    token: 'pat_ZiVGbB5siln3M8TWCLEvAuq63ugpMc6meCoWe9jTnivP7fzu1g6fPVv5uVPZ1AMi',
+    token: 'pat_EUaDm2YEP0OEVV8npjsjnngrXRnxNyaYLNX6cXGGt31ttU9OCMB3SPGPgaoWjYGr',
     workflowIds: {
         a: '7560945341966483502',
         b: '7553278219114971136', // 简单物料查询工作流
